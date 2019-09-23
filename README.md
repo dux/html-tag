@@ -36,7 +36,7 @@ tag._row [                      # <div class="row">
 ]                               # </div>
 ```
 
-### From tests
+### More examples
 
 #### Tag without data
 ```ruby
@@ -116,9 +116,9 @@ end
 </div>
 ```
 
-#### Renders html in array do
+#### Renders html data passed as an array
 ```ruby
-= data = tag._row [
+= tag._row [
   tag.('#menu.col') { @menu },
   tag._col { @data }
 ]
