@@ -2,6 +2,20 @@
 
 HTML tag builder "on steroids"
 
+## Install
+
+### Gemfile
+
+`gem 'html-tag'`
+
+### Manual require
+
+`require 'html-tag'`
+
+## Usage
+
+Example
+
 ```ruby
 = tag.ul do |n|                  # <ul>
   1.upto(3) do |num|           #
