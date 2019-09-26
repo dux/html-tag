@@ -17,11 +17,11 @@ class HtmlTagBuilder
         data = nil
       end
 
-      # covert n._row to n(class: 'row')
+      # covert n._row_foo to n(class: 'row-foo')
       name = name.to_s
       if name.to_s[0, 1] == '_'
         opts ||= {}
-        opts[:class] = name.to_s.sub('_', '')
+        opts[:class] = name.to_s.sub('_', '').gsub('_', '-')
         name = :div
       end
 
@@ -82,6 +82,7 @@ class HtmlTagBuilder
 
     def __add_opts opts, key, value
       unless value.to_s.blank?
+        value = value.join(' ') if value.is_a?(Array)
         opts.push key.to_s.gsub(/_/,'-')+'="'+value.to_s.gsub(/"/,'&quot;')+'"'
       end
     end
@@ -101,10 +102,12 @@ class HtmlTagBuilder
     @data.push data
   end
 
-  # n.div(class: 'klasa') do -> n.('klasa') do
+  # n.('foo') do -> n.div(class: 'foo') do
   def call class_name, &block
     @data.push self.class.tag(:div, { class: class_name }, &block)
   end
+
+  private
 
   # forward to class
   def method_missing tag_name, *args, &block

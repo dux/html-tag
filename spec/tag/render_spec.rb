@@ -36,6 +36,14 @@ describe HtmlTagBuilder do
         expect(tag._miki(id: :foo, data: { bar: :baz })).to eq('<div id="foo" data-bar="baz" class="miki"></div>')
       end
 
+      it 'renders underscore notation and joins array attributes' do
+        expect(tag._foo_bar(data: { foo: %w(bar baz) })).to eq('<div data-foo="bar baz" class="foo-bar"></div>')
+      end
+
+      it 'renders arary data' do
+        expect(tag.div [tag.i, tag.u, tag.b]).to eq('<div><i></i><u></u><b></b></div>')
+      end
+
       it 'renders tag with nested data' do
         data = tag._foo do |n|
           n.ul do |n|

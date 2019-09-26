@@ -2,6 +2,8 @@
 
 HTML tag builder "on steroids"
 
+https://github.com/dux/html-tag
+
 ## Install
 
 ### Gemfile
@@ -17,7 +19,7 @@ HTML tag builder "on steroids"
 Example
 
 ```ruby
-= tag.ul do |n|                  # <ul>
+= tag.ul do |n|                # <ul>
   1.upto(3) do |num|           #
     n.li do |n|                #   <li>
       n.i 'arrow'              #     <i class="arrow"></i>
@@ -26,9 +28,10 @@ Example
       n.span { 123 }           #     <span>123</span>
       n._foo                   #     <div class="foo"></div>
       n._foo(bar: baz) { 123 } #     <div class="foo" bar="baz">123</div>
-    end
-  end
-end
+      n.i(foo: [:bar, :baz])   #     <i foo="bar baz"></i>
+    end                        #   </li>
+  end                          #
+end                            # </ul>
 
 tag._row [                      # <div class="row">
   tag.('#menu.col') { @menu },  #   <div id="menu" class="col">@menu</div>
@@ -91,6 +94,26 @@ tag._row [                      # <div class="row">
 
 ```html
 <div id="foo" data-bar="baz" class="miki"></div>
+```
+
+#### Tag with underscore notation and array attributes
+
+```ruby
+= tag._foo_bar(data: { foo: %w(bar baz) }))
+```
+
+```html
+<div data-foo="bar baz" class="foo-bar"></div>
+```
+
+#### Tag with array data attributes
+
+```ruby
+tag.div [tag.i, tag.u, tag.b]
+```
+
+```html
+<div><i></i><u></u><b></b></div>
 ```
 
 #### Tag with nested data
