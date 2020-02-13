@@ -45,10 +45,11 @@ describe HtmlTagBuilder do
       end
 
       it 'renders tag with nested data' do
-        data = tag._foo do |n|
-          n.ul do |n|
-            n.li do |n|
-              n.a(href: '#') { 'baz' }
+        data =
+        tag._foo do
+          tag.ul do
+            tag.li do
+              tag.a(href: '#') { 'baz' }
             end
           end
         end

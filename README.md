@@ -118,11 +118,11 @@ tag.div [tag.i, tag.u, tag.b]
 
 #### Tag with nested data
 ```ruby
-= tag._foo do |n|
-  n.ul do |n|
-    n.li do |n|
-      n.a(href: '#') { 'baz 1' }
-      n.a(href: '#') { 'baz 2'  }
+tag._foo do
+  tag.ul do
+    tag.li do
+      tag.a(href: '#') { 'baz 1' }
+      tag.a(href: '#') { 'baz 2'  }
     end
   end
 end
