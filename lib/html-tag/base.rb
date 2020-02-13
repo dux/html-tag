@@ -40,11 +40,11 @@ class HtmlTagBuilder
       data, opts = opts, {} unless opts.class == Hash
 
       if block_given?
-        inline = new
-        data = yield(inline, opts)
+        stack = new
+        data  = yield(stack, opts)
 
         # if data is pushed to passed node, use that data
-        data = inline.data if inline.data.first
+        data = stack.data if stack.data.first
       end
 
       data = data.join('') if data.is_a?(Array)
@@ -69,8 +69,8 @@ class HtmlTagBuilder
 
       return opts unless node
 
-      text = yield opts if block_given?
-      text ||= '' unless ['input', 'img', 'meta', 'link', 'hr', 'br'].include?(node.to_s)
+      empty_tags = ['input', 'img', 'meta', 'link', 'hr', 'br', 'col', 'frame', 'area']
+      text ||= '' unless empty_tags.include?(node.to_s)
       out = text ? %{<#{node}#{opts}>#{text}</#{node}>} : %{<#{node}#{opts} />}
       out.respond_to?(:html_safe) ? out.html_safe : out
     end

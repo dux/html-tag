@@ -65,6 +65,21 @@ describe HtmlTagBuilder do
 
         expect(data).to eq('<div class="row"><div id="menu" class="#menu col"></div><div class="col"></div></div>')
       end
+
+      it 'renders complex data' do
+        buttons = []
+        buttons.push ['Home', '/']
+        buttons.push ['Links', '/links']
+
+        data =
+        tag.div do |n|
+          buttons.each do |name, path|
+            n.a({class: 'btn', href: path }) { name }
+          end
+        end
+
+        expect(data).to eq('<div><a class="btn" href="/">Home</a><a class="btn" href="/links">Links</a></div>')
+      end
     end
   end
 end
