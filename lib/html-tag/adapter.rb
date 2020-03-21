@@ -8,26 +8,42 @@ module HtmlTagBuilderHelper
   end
 end
 
-# Rails
+# add to Rails, Sinatra or all other that respond to ApplicationHelper
 if defined?(ActionView::Base)
-  ActionView::Base.send :include, HtmlTagBuilderHelper
-
-# Sinatra
+  class ActionView::Base
+    def tag *args, &block
+      args.first ? HtmlTagBuilder.tag(*args, &block) : HtmlTagBuilder
+    end
+  end
 elsif defined?(Sinatra::Base)
   class Sinatra::Base
-    include HtmlTagBuilderHelper
-    alias :tag :xtag
+    def tag *args, &block
+      args.first ? HtmlTagBuilder.tag(*args, &block) : HtmlTagBuilder
+    end
   end
-
-# Lux and other
 elsif defined?(ApplicationHelper)
-  # all other frameworks, including Lux
   module ApplicationHelper
-    include HtmlTagBuilderHelper
-    alias :tag :xtag
+    def tag *args, &block
+      args.first ? HtmlTagBuilder.tag(*args, &block) : HtmlTagBuilder
+    end
   end
-
 end
 
+# Hash
+unless {}.respond_to?(:tag)
+  class Hash
+    def tag node_name=nil, inner_html=nil
+      HtmlTagBuilder.build self, node_name, inner_html
+    end
+  end
+end
 
+# String
+unless ''.respond_to?(:tag)
+  class String
+    def tag node_name, opts={}
+      HtmlTagBuilder.build opts, node_name, self
+    end
+  end
+end
 
