@@ -32,7 +32,7 @@ end
 # Hash
 unless {}.respond_to?(:tag)
   class Hash
-    def tag node_name=nil, inner_html=nil
+    def tag node_name, inner_html=nil
       HtmlTagBuilder.build self, node_name, inner_html
     end
   end
@@ -46,4 +46,3 @@ unless ''.respond_to?(:tag)
     end
   end
 end
-

@@ -113,12 +113,16 @@ tag.div [tag.i, tag.u, tag.b]
 ```
 
 ```html
-<div><i></i><u></u><b></b></div>
+<div>
+  <i></i>
+  <u></u>
+  <b></b>
+</div>
 ```
 
 #### Tag with nested data
 ```ruby
-= tag._foo do |n|
+tag._foo do |n|
   n.ul do |n|
     n.li do |n|
       n.a(href: '#') { 'baz 1' }
@@ -153,3 +157,24 @@ end
   <div class="col"></div>
 </div>
 ```
+
+#### Renders tag from String base
+
+```ruby
+'foo'.tag(:bold, class: :baz)
+```
+
+```html
+<bold class="baz">foo</bold>
+```
+
+#### Renders tag from Hash base
+
+```ruby
+{ class: :baz }.tag(:bold, 'foo')
+```
+
+```html
+<bold class="baz">foo</bold>
+```
+
