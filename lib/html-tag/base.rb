@@ -83,7 +83,8 @@ class HtmlTagBuilder
     def __add_opts opts, key, value
       unless value.to_s.blank?
         value = value.join(' ') if value.is_a?(Array)
-        opts.push key.to_s.gsub(/_/,'-')+'="'+value.to_s.gsub(/"/,'&quot;')+'"'
+        key   = key.to_s.gsub(/data_/,'data-')
+        opts.push key+'="'+value.to_s.gsub(/"/,'&quot;')+'"'
       end
     end
 

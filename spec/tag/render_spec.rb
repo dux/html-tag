@@ -80,6 +80,12 @@ describe HtmlTagBuilder do
 
         expect(data).to eq('<div><a class="btn" href="/">Home</a><a class="btn" href="/links">Links</a></div>')
       end
+
+      it 'fixes attr when needed' do
+        expect({ 'data_foo'=>:bar}.tag :div).to eq('<div data-foo="bar"></div>')
+        expect({ 'foo-bar'=>:bar}.tag :div).to eq('<div foo-bar="bar"></div>')
+        expect({ 'foo_bar'=>:bar}.tag :div).to eq('<div foo_bar="bar"></div>')
+      end
     end
   end
 end
