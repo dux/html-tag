@@ -128,6 +128,9 @@ tag._foo do |n|
       n.a(href: '#') { 'baz 1' }
       n.a(href: '#') { 'baz 2'  }
     end
+
+    n.push 123
+    n.push { 456 }
   end
 end
 ```
@@ -139,6 +142,8 @@ end
       <a href="#">baz 1</a>
       <a href="#">baz 2</a>
     </li>
+    123
+    456
   </ul>
 </div>
 ```

@@ -46,15 +46,17 @@ describe HtmlTagBuilder do
 
       it 'renders tag with nested data' do
         data =
-        tag._foo do
-          tag.ul do
-            tag.li do
-              tag.a(href: '#') { 'baz' }
+        tag._foo do |n|
+          n.ul do |n|
+            n.li do |n|
+              n.a(href: '#') { 'baz' }
             end
+            n.push 123
+            n.push { 456 }
           end
         end
 
-        expect(data).to eq('<div class="foo"><ul><li><a href="#">baz</a></li></ul></div>')
+        expect(data).to eq('<div class="foo"><ul><li><a href="#">baz</a></li>123456</ul></div>')
       end
 
       it 'renders html in array' do

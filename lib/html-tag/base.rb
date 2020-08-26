@@ -87,7 +87,6 @@ class HtmlTagBuilder
         opts.push key+'="'+value.to_s.gsub(/"/,'&quot;')+'"'
       end
     end
-
   end
 
   ###
@@ -99,8 +98,8 @@ class HtmlTagBuilder
   end
 
   # push data to stack
-  def push data
-    @data.push data
+  def push data=nil
+    @data.push block_given? ? yield : data
   end
 
   # n.('foo') do -> n.div(class: 'foo') do
