@@ -17,6 +17,9 @@ class HtmlTagBuilder
         data = nil
       end
 
+      # tag.div(:a) { 1 } -> <div class="a">1</div>
+      opts = opts.to_s if opts.class == Symbol
+
       # covert n._row_foo to n(class: 'row-foo')
       name = name.to_s
       if name.to_s[0, 1] == '_'

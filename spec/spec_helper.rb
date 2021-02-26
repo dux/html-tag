@@ -1,4 +1,5 @@
 require 'fast_blank'
+require 'amazing_print'
 
 module ApplicationHelper
 end

@@ -18,7 +18,13 @@ end
 
 # All other objects
 class Object
-  def tag *args, &block
-    args.first ? HtmlTagBuilder.tag(*args, &block) : HtmlTagBuilder
+  def tag
+    HtmlTagBuilder
+  end
+
+  # Rails has tag methd defeined in views, in ActionView::Helpers::TagHelper
+  # Access HtmlTagBuilder via xtag then
+  def xtag
+    HtmlTagBuilder
   end
 end
