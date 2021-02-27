@@ -1,6 +1,3 @@
-unless ''.respond_to?(:blank?)
-  require 'fast_blank'
-end
-
-require_relative './html-tag/base'
+require_relative './html-tag/html_tag_builder'
+require_relative './html-tag/html_tag'
 require_relative './html-tag/adapter'

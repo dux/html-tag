@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe HtmlTagBuilder do
-  let!(:tag) { HtmlTagBuilder }
+describe HtmlTag do
+  let!(:tag) { HtmlTag }
 
   describe 'Renders string tag as expected' do
     context String do

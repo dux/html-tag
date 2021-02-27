@@ -19,6 +19,10 @@ https://github.com/dux/html-tag
 Example
 
 ```ruby
+# imports tag method
+# then use "tag" or "HtmlTag" without import
+include HtmlTag
+
 = tag.ul do |n|                # <ul>
   1.upto(3) do |num|           #
     n.li do |n|                #   <li>
@@ -34,8 +38,8 @@ Example
 end                            # </ul>
 
 tag._row [                      # <div class="row">
-  tag.('#menu.col') { @menu },  #   <div id="menu" class="col">@menu</div>
   tag._col { @data }            #   <div class="col">@data</div>
+  tag._foo_bar__baz { @data }   #   <div class="foo-bar baz">@data</div>
 ]                               # </div>
 ```
 
@@ -48,6 +52,17 @@ tag._row [                      # <div class="row">
 
 ```html
 <div></div>
+```
+
+#### Empty tags
+```ruby
+= tag.hr
+= tag.meta name: :foo, description: :bar
+```
+
+```html
+<div></div>
+<meta name="foo" description="bar" />
 ```
 
 #### Tag with block data
@@ -70,7 +85,7 @@ tag._row [                      # <div class="row">
 
 #### Tag with inline data and params
 ```ruby
-= tag.div({foo: :bar}, 'baz')
+= tag.div('baz', {foo: :bar})
 ```
 
 ```html
@@ -80,10 +95,12 @@ tag._row [                      # <div class="row">
 #### Tag with class shortcut
 ```ruby
 = tag._foo
+= HtmlTag.i(:foo) { 'baz' } 
 ```
 
 ```html
 <div class="foo"></div>
+<i class="foo">baz</i>
 ```
 
 #### Tag with nested opts and shortcut
@@ -99,11 +116,11 @@ tag._row [                      # <div class="row">
 #### Tag with underscore notation and array attributes
 
 ```ruby
-= tag._foo_bar(data: { foo: %w(bar baz) }))
+= tag._foo_bar__baz(data: { foo: %w(bar baz) }))
 ```
 
 ```html
-<div data-foo="bar baz" class="foo-bar"></div>
+<div data-foo="bar baz" class="foo-bar baz"></div>
 ```
 
 #### Tag with array data attributes
@@ -151,14 +168,14 @@ end
 #### Renders html data passed as an array
 ```ruby
 = tag._row [
-  tag.('#menu.col') { @menu },
+  tag.i(id: :menu, class: :col) { @menu },
   tag._col { @data }
 ]
 ```
 
 ```html
 <div class="row">
-  <div id="menu" class="#menu col"></div>
+  <div id="menu" class="col"></div>
   <div class="col"></div>
 </div>
 ```
@@ -183,3 +200,20 @@ end
 <bold class="baz">foo</bold>
 ```
 
+## Dependency
+
+none
+
+## Development
+
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rspec` to run the tests.
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/dux/html-tag.
+This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the
+[Contributor Covenant](http://contributor-covenant.org) code of conduct.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

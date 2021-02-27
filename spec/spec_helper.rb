@@ -1,8 +1,4 @@
-require 'fast_blank'
 require 'amazing_print'
-
-module ApplicationHelper
-end
 
 class Object
   def rr data

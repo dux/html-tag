@@ -9,6 +9,4 @@ Gem::Specification.new gem_name, version do |gem|
   gem.files       = Dir['./lib/**/*.rb']+['./.version']
   gem.homepage    = 'https://github.com/dux/%s' % gem_name
   gem.license     = 'MIT'
-
-  gem.add_runtime_dependency 'fast_blank', '~> 1'
 end

@@ -1,16 +1,9 @@
 require 'spec_helper'
 
-describe HtmlTagBuilder do
-  let!(:tag) { HtmlTagBuilder }
+describe HtmlTag do
+  let!(:tag) { HtmlTag }
 
   describe 'Renders as expected' do
-    context 'in a framework (Rails, Lux)' do
-      it 'is added to ApplicationHelper' do
-        ApplicationHelper.send :extend, ApplicationHelper
-        expect(ApplicationHelper.tag :div, :foo).to eq('<div>foo</div>')
-      end
-    end
-
     context 'without a framework' do
       it 'renders tag without data' do
         expect(tag.div).to eq('<div></div>')
@@ -20,12 +13,20 @@ describe HtmlTagBuilder do
         expect(tag.div { 'foo' }).to eq('<div>foo</div>')
       end
 
+      it 'render class if passed as symbol' do
+        expect(tag.div(:foo_bar__baz) { 'bor' }).to eq('<div class="foo-bar baz">bor</div>')
+      end
+
+      it 'render meta tag' do
+        expect(tag.meta name: :foo, description: :bar).to eq('<meta name="foo" description="bar" />')
+      end
+
       it 'renders tag with inline data and no params' do
         expect(tag.div('baz')).to eq('<div>baz</div>')
       end
 
       it 'renders tag with inline data and params' do
-        expect(tag.div({foo: :bar}, 'baz')).to eq('<div foo="bar">baz</div>')
+        expect(tag.div('baz', {foo: :bar})).to eq('<div foo="bar">baz</div>')
       end
 
       it 'renders tag with class shortcut' do
@@ -61,11 +62,11 @@ describe HtmlTagBuilder do
 
       it 'renders html in array' do
         data = tag._row [
-          tag.('#menu.col') { @menu },
-          tag._col { @data }
+          tag.div(id: :menu, class: :col) { 'menu' },
+          tag._col { 'data' }
         ]
 
-        expect(data).to eq('<div class="row"><div id="menu" class="#menu col"></div><div class="col"></div></div>')
+        expect(data).to eq('<div class="row"><div id="menu" class="col">menu</div><div class="col">data</div></div>')
       end
 
       it 'renders complex data' do
@@ -87,6 +88,27 @@ describe HtmlTagBuilder do
         expect({ 'data_foo'=>:bar}.tag :div).to eq('<div data-foo="bar"></div>')
         expect({ 'foo-bar'=>:bar}.tag :div).to eq('<div foo-bar="bar"></div>')
         expect({ 'foo_bar'=>:bar}.tag :div).to eq('<div foo_bar="bar"></div>')
+      end
+
+      it 'renders empty tags' do
+        expect(tag.hr).to eq('<hr />')
+      end
+
+      it 'renders array attributes' do
+        expect(tag.div [tag.i, tag.u, tag.b]).to eq('<div><i></i><u></u><b></b></div>')
+      end
+
+      it 'allowes opts and data to be send in any way' do
+        expect(tag.div('foo', bar: :baz)).to eq('<div bar="baz">foo</div>')
+        expect(tag.div({bar: :baz}, 'foo')).to eq('<div bar="baz">foo</div>')
+      end
+
+      it 'does not allow double data to be sent' do
+        expect { tag.div('foo') { 'bar' } }.to raise_error ArgumentError
+      end
+
+      it 'does not allow data to be send as hash' do
+        expect { tag.div({id: :foo}, { foo: :bar}) }.to raise_error ArgumentError
       end
     end
   end
