@@ -81,8 +81,7 @@ class HtmlTagBuilder
 
       if node
         text ||= '' unless EMPTY_TAGS.include?(node)
-        out = text ? %{<#{node}#{opts}>#{text}</#{node}>} : %{<#{node}#{opts} />}
-        out.respond_to?(:html_safe) ? out.html_safe : out
+        text ? %{<#{node}#{opts}>#{text}</#{node}>} : %{<#{node}#{opts} />}
       else
         opts
       end
