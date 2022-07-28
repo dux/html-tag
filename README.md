@@ -19,10 +19,38 @@ https://github.com/dux/html-tag
 Example
 
 ```ruby
+# You can use it in 2 ways
+
+# without node pointer
+# - invoked when calling class as a method
+# - block is run in context of HtmlTag class instance
+# - use "this" prefix to access methods in parent context
+# - instance variables are accessible
+HtmlTag :ul do
+  li do
+    a href: '#', class: this.klass_name
+  end
+
+  @list.each_with_index do |el, i|
+    li el, num: i
+  end
+end
+
+# with node pointers
+# - more efficient but not so readable
+# - block is run in context of caller
+HtmlTag.ul do |n|
+  n.li do |n|
+    n.a href: '#', class: klass_names
+  end
+
+  @list.each_with_index do |el, i|
+    n.li el, num: i
+  end
+end
+
 # imports tag method
 # then use "tag" or "HtmlTag" without import
-include HtmlTag
-
 = tag.ul do |n|                # <ul>
   1.upto(3) do |num|           #
     n.li do |n|                #   <li>
@@ -36,11 +64,6 @@ include HtmlTag
     end                        #   </li>
   end                          #
 end                            # </ul>
-
-tag._row [                      # <div class="row">
-  tag._col { @data }            #   <div class="col">@data</div>
-  tag._foo_bar__baz { @data }   #   <div class="foo-bar baz">@data</div>
-]                               # </div>
 ```
 
 ### More examples
@@ -123,31 +146,18 @@ tag._row [                      # <div class="row">
 <div data-foo="bar baz" class="foo-bar baz"></div>
 ```
 
-#### Tag with array data attributes
-
-```ruby
-tag.div [tag.i, tag.u, tag.b]
-```
-
-```html
-<div>
-  <i></i>
-  <u></u>
-  <b></b>
-</div>
-```
-
 #### Tag with nested data
 ```ruby
-tag._foo do |n|
-  n.ul do |n|
-    n.li do |n|
-      n.a(href: '#') { 'baz 1' }
-      n.a(href: '#') { 'baz 2'  }
+HtmlTag class: :foo do
+  ul do
+    li do
+      a 'baz 1', href: '#'
+      a 'baz 2', href: '#'
     end
 
-    n.push 123
-    n.push { 456 }
+    push 123
+
+    node :foo, :bar
   end
 end
 ```
@@ -160,23 +170,8 @@ end
       <a href="#">baz 2</a>
     </li>
     123
-    456
+    <foo>bar</foo>
   </ul>
-</div>
-```
-
-#### Renders html data passed as an array
-```ruby
-= tag._row [
-  tag.i(id: :menu, class: :col) { @menu },
-  tag._col { @data }
-]
-```
-
-```html
-<div class="row">
-  <div id="menu" class="col"></div>
-  <div class="col"></div>
 </div>
 ```
 

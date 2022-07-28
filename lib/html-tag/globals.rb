@@ -2,7 +2,7 @@
 unless {}.respond_to?(:tag)
   class Hash
     def tag node_name, inner_html=nil
-      ::HtmlTagBuilder.build node_name, self, inner_html
+      ::HtmlTag::Outbound.build node_name, self, inner_html
     end
   end
 end
@@ -11,7 +11,7 @@ end
 unless ''.respond_to?(:tag)
   class String
     def tag node_name, opts={}
-      ::HtmlTagBuilder.build node_name, opts, self
+      ::HtmlTag::Outbound.build node_name, opts, self
     end
   end
 end
