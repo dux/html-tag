@@ -8,6 +8,8 @@
 
 module HtmlTag
   class Inbound
+    IVARS ||= Struct.new :HtmlTagInboundIvars, :context, :data, :depth, :inbound
+
     # allows to add cusom tags if needed
     # HtmlTag::Inbound.define :foo
     def self.define tag, empty: false
@@ -28,24 +30,27 @@ module HtmlTag
     def initialize context
       # copy all instance varialbes from context
       for el in context.instance_variables
-        unless el.to_s.include?('@_tag_')
+        unless el.to_s.include?('@_')
           val = context.instance_variable_get el
           instance_variable_set el, val
         end
       end
 
-      @_tag_context = context
-      @_tag_data    = []
-      @_tag_depth   = 0
+      # lets keep all instance vars in one object
+      @_iv = IVARS.new
+      @_iv.context = context
+      @_iv.data    = []
+      @_iv.depth   = 0
+      @_iv.inbound = true
     end
 
     # access parent context via parent / context / this
     # h1 class: this.class_name
     def parent &block
       if block
-        @_tag_context.instance_exec(&block)
+        @_iv.context.instance_exec(&block)
       else
-        @_tag_context
+        @_iv.context
       end
     end
     alias :context :parent
@@ -53,7 +58,7 @@ module HtmlTag
 
     # export renderd data
     def render
-      @_tag_data
+      @_iv.data
         .join('')
         .gsub(/\n+/, $/)
         .gsub(/([\w>])[[:blank:]]+</, '\1<')
@@ -63,12 +68,16 @@ module HtmlTag
     def node name, *args, &block
       opt_hash, opt_data = args
 
+      # allow any arragement of vars
+      # div class: :foo, 123
+      # div 123, class: :foo
       if opt_hash && opt_hash.class != Hash
         opt_hash, opt_data = opt_data, opt_hash
       end
 
-      tag = "\n%s<%s" % [' ' * @_tag_depth, name]
+      tag = "\n%s<%s" % [' ' * @_iv.depth, name]
 
+      # if opts given, add them
       if opt_hash
         tag += ' '
         tag += opt_hash.inject([]) do |t, el|
@@ -85,31 +94,38 @@ module HtmlTag
         tag += '>'
       end
 
-      @_tag_data << tag
+      @_iv.data << tag
 
+      # nested blocks
       if block
-        @_tag_depth += 1
-        instance_exec(&block)
-        @_tag_depth -= 1
+        @_iv.depth += 1
+        instance_exec(@_iv.context, &block)
+        # block.call(self) # for outbound render
+        @_iv.depth -= 1
       end
 
       if EMPTY_TAGS.include?(name)
-        @_tag_data << ' />'
+        @_iv.data << ' />'
       else
         unless opt_data
-          @_tag_data << ' ' * @_tag_depth
+          @_iv.data << ' ' * @_iv.depth
         end
 
-        @_tag_data << "%s</%s>\n" % [opt_data, name]
+        @_iv.data << "%s</%s>\n" % [opt_data, name]
       end
     end
 
     def push data
-      @_tag_data << data
+      @_iv.data << data
     end
 
     def method_missing name, *args, &block
-      raise NoMethodError.new(%[HTML node "#{name}" not found. Use this.#{name}() to call node in parent context or use node(:#{name}, params, data) to add custom html node.])
+      message = [
+        %{HTML node "#{name}" not found.},
+        "Use this.#{name}() to call node in parent context",
+        "or use node(:#{name}, params, data) to add custom html node."
+      ]
+      raise NoMethodError.new(message.join(' '))
     end
   end
 end

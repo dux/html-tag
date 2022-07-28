@@ -30,17 +30,3 @@ module HtmlTag
     end
   end
 end
-
-# HtmlTag do ...
-def HtmlTag *args, &block
-  args[0] ||= :div
-
-  if args[0].class == Hash
-    args[1] = args[0]
-    args[0] = :div
-  end
-
-  out = HtmlTag::Inbound.new self
-  out.send(*args, &block)
-  out.render
-end

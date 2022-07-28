@@ -5,9 +5,19 @@ require 'spec_helper'
 class InboudRspec
   include HtmlTag
 
+  def numbers
+    1234
+  end
+
   def get_data1
     tag :ul, class: :foo do
       li 123
+    end
+  end
+
+  def get_data2
+    tag.ul do |n|
+      n.li numbers
     end
   end
 end
@@ -56,5 +66,12 @@ describe HtmlTag::Inbound do
         expect(data).to include(%[<input num="123" />])
       end
     end
+
+    # context 'outbound' do
+    #   it 'renders' do
+    #     data = InboudRspec.new.get_data2
+    #     expect(data).to eq("\n<ul>\n <li>1234</li>\n</ul>\n")
+    #   end
+    # end
   end
 end
