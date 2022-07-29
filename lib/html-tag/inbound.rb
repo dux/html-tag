@@ -27,7 +27,7 @@ module HtmlTag
 
     ###
 
-    def initialize context
+    def initialize context = nil
       # copy all instance varialbes from context
       for el in context.instance_variables
         unless el.to_s.include?('@_')
@@ -66,7 +66,7 @@ module HtmlTag
 
     # render single node
     def tag name, *args, &block
-      opt_hash, opt_data = _prepare_tag_params args
+      name, opt_hash, opt_data = _prepare_tag_params name, args
 
       tag_data = "%s%s<%s" % [_depth_new_line, _depth_spaces, name]
 
@@ -76,15 +76,18 @@ module HtmlTag
         tag_data += opt_hash.inject([]) do |t, el|
           key, value = el
 
-          case value
-          when Array
-            value = value.join(' ')
-          when Hash
+          if value.class == Hash
             for el in value
-              t.push '%s-%s="%s"' % [key, el[0], _escape_param(el[1])]
+              t.push "%s-%s='%s'" % [key, el[0], _escape_param(el[1])]
             end
           else
-            t.push '%s="%s"' % [key, _escape_param(value)]
+            if value.class == Array
+              value = value.join(' ')
+            end
+
+            key = key.to_s.sub(/^data_/, 'data-')
+
+            t.push "%s='%s'" % [key, _escape_param(value)]
           end
           t
         end.join(' ')
@@ -99,8 +102,15 @@ module HtmlTag
       # nested blocks
       if block
         @_iv.depth += 1
-        instance_exec(@_iv.context, &block)
-        # block.call(self) # for outbound render
+
+        if @_iv.context
+          # HtmlTag scope
+          instance_exec(&block)
+        else
+          # outbound scope
+          block.call(self)
+        end
+
         @_iv.depth -= 1
       end
 
@@ -123,19 +133,7 @@ module HtmlTag
       klass = name.to_s
 
       if klass.start_with?('_')
-        # _foo__bar-baz class: 'dux' ->  <div class="foo bar-baz dux"></div>
-        classes = klass
-          .sub('_', '')
-          .split('__')
-          .map{|it| it.gsub('_', '-') }
-          .join(' ')
-
-        prepared = _prepare_tag_params args
-
-        prepared[0] ||= {}
-        prepared[0][:class] = "#{classes} #{prepared[0][:class]}".sub(/\s+$/, '')
-
-        tag :div, *prepared, &block
+        tag klass, *args, &block
       else
         message = [
           %{HTML tag "#{name}" not found.},
@@ -148,7 +146,7 @@ module HtmlTag
 
     private
 
-    def _prepare_tag_params args
+    def _prepare_tag_params name, args
       opt_hash, opt_data = args
 
       # allow any arragement of vars
@@ -158,7 +156,22 @@ module HtmlTag
         opt_hash, opt_data = opt_data, opt_hash
       end
 
-      [opt_hash, opt_data]
+      # _foo__bar-baz class: 'dux' ->  <div class="foo bar-baz dux"></div>
+      klass = name.to_s
+      if klass.start_with?('_')
+        classes = klass
+          .sub('_', '')
+          .split('__')
+          .map{|it| it.gsub('_', '-') }
+          .join(' ')
+
+        klass = :div
+
+        opt_hash ||= {}
+        opt_hash[:class] = "#{classes} #{opt_hash[:class]}".sub(/\s+$/, '')
+      end
+
+      [klass, opt_hash, opt_data]
     end
 
     def _depth_spaces
@@ -174,7 +187,7 @@ module HtmlTag
     end
 
     def _escape_param el
-      el.to_s.gsub(/"/, '&quot;')
+      el.to_s.gsub(/'/, '&apos;')
     end
   end
 end

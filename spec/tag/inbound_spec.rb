@@ -26,14 +26,14 @@ describe HtmlTag::Inbound do
   context 'via tag' do
     it 'renders' do
       data = InboudRspec.new.get_data1
-      expect(data).to eq("<ul class=\"foo\"><li>123</li></ul>")
+      expect(data).to eq("<ul class='foo'><li>123</li></ul>")
     end
   end
 
   context 'inboud' do
     it 'inline tag' do
       data = HtmlTag { input name: :foo }
-      expect(data).to include(%[<input name="foo" />])
+      expect(data).to include(%[<input name='foo' />])
     end
 
     it 'outbound data' do
@@ -62,30 +62,39 @@ describe HtmlTag::Inbound do
       end
 
       data = HtmlTag { input 456, num: this.foo }
-      expect(data).to include(%[<input num="123" />])
+      expect(data).to include(%[<input num='123' />])
     end
 
     it 'renders class names with shorthand' do
       data = HtmlTag { _foo__bar_baz 123, class: 'dux' }
-      expect(data).to include(%[<div class="foo bar-baz dux">123</div>])
+      expect(data).to include(%[<div class='foo bar-baz dux'>123</div>])
     end
 
     it 'renders depth' do
-      expect(InboudRspec.new.get_data1).to eq("<ul class=\"foo\"><li>123</li></ul>")
+      expect(InboudRspec.new.get_data1).to eq("<ul class='foo'><li>123</li></ul>")
       HtmlTag::OPTS[:format] = true
-      expect(InboudRspec.new.get_data1).to eq("\n<ul class=\"foo\">\n  <li>123</li>\n</ul>\n")
+      expect(InboudRspec.new.get_data1).to eq("\n<ul class='foo'>\n  <li>123</li>\n</ul>\n")
+      HtmlTag::OPTS[:format] = false
     end
 
     it 'renders data opts' do
       data = HtmlTag { _foo 456, data: {foo: :bar} }
-      expect(data).to include(%[<div data-foo="bar" class="foo">456</div>])
+      expect(data).to include(%[<div data-foo='bar' class='foo'>456</div>])
     end
   end
 
-  # context 'outbound' do
-  #   it 'renders' do
-  #     data = InboudRspec.new.get_data2
-  #     expect(data).to eq("\n<ul>\n <li>1234</li>\n</ul>\n")
-  #   end
-  # end
+  context 'outbound' do
+    it 'renders' do
+      def ofoo
+        12
+      end
+
+      data = HtmlTag().ul do |n|
+        n.li ofoo
+        n.li {|n| n.push(34) }
+      end
+
+      expect(data).to eq('<ul><li>12</li><li>34</li></ul>')
+    end
+  end
 end

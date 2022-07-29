@@ -23,6 +23,7 @@ module HtmlTag
     if block
       HtmlTag *args, &block
     else
+      # HtmlTag()
       ::HtmlTag::Outbound
     end
   end
@@ -30,6 +31,7 @@ module HtmlTag
   # forward to class only if
   def method_missing tag_name, *args, &block
     if self === HtmlTag
+      # Proxy.new.tag(tag_name, args[0], args[1], &block)
       Outbound.tag(tag_name, args[0], args[1], &block)
     else
       super

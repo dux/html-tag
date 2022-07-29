@@ -6,16 +6,16 @@ describe HtmlTag do
   describe 'Renders string tag as expected' do
     context String do
       it 'is renders tag' do
-        node = 'foo'.tag(:bold)
-        expect(node).to eq('<bold>foo</bold>')
+        node = 'foo'.tag(:strong)
+        expect(node).to eq('<strong>foo</strong>')
 
-        node = 'foo'.tag(:bold, class: :baz)
-        expect(node).to eq('<bold class="baz">foo</bold>')
+        node = 'foo'.tag(:strong, class: :baz)
+        expect(node).to eq("<strong class='baz'>foo</strong>")
       end
 
       it 'encodes quotes' do
-        node = 'foo'.tag(:bold, onclick: %[alert('"')])
-        expect(node).to eq(%{<bold onclick="alert('&quot;')">foo</bold>})
+        node = 'foo'.tag(:strong, onclick: %[alert('"')])
+        expect(node).to eq("<strong onclick='alert(&apos;\"&apos;)'>foo</strong>")
       end
     end
   end
@@ -23,8 +23,8 @@ describe HtmlTag do
   describe 'Renders hash tag as expected' do
     context Hash do
       it 'is renders tag' do
-        node = {class: :baz}.tag(:bold, 'foo')
-        expect(node).to eq('<bold class="baz">foo</bold>')
+        node = {class: :baz}.tag(:strong, 'foo')
+        expect(node).to eq("<strong class='baz'>foo</strong>")
       end
     end
   end

@@ -85,9 +85,9 @@ describe HtmlTag do
       end
 
       it 'fixes attr when needed' do
-        expect({ 'data_foo'=>:bar}.tag :div).to eq('<div data-foo="bar"></div>')
-        expect({ 'foo-bar'=>:bar}.tag :div).to eq('<div foo-bar="bar"></div>')
-        expect({ 'foo_bar'=>:bar}.tag :div).to eq('<div foo_bar="bar"></div>')
+        expect({ 'data_foo'=>:bar}.tag :div).to eq("<div data-foo='bar'></div>")
+        expect({ 'foo-bar'=>:bar}.tag :div).to eq("<div foo-bar='bar'></div>")
+        expect({ 'foo_bar'=>:bar}.tag :div).to eq("<div foo_bar='bar'></div>")
       end
 
       it 'renders empty tags' do
