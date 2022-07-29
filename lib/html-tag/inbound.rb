@@ -18,7 +18,7 @@ module HtmlTag
       end
 
       define_method tag do |*args, &block|
-        node tag, *args, &block
+        tag tag, *args, &block
       end
     end
 
@@ -65,36 +65,36 @@ module HtmlTag
     end
 
     # render single node
-    def node name, *args, &block
-      opt_hash, opt_data = args
+    def tag name, *args, &block
+      opt_hash, opt_data = _prepare_tag_params args
 
-      # allow any arragement of vars
-      # div class: :foo, 123
-      # div 123, class: :foo
-      if opt_hash && opt_hash.class != Hash
-        opt_hash, opt_data = opt_data, opt_hash
-      end
+      tag_data = "%s%s<%s" % [_depth_new_line, _depth_spaces, name]
 
-      tag = "\n%s<%s" % [' ' * @_iv.depth, name]
-
-      # if opts given, add them
+      # if tag params given, add them
       if opt_hash
-        tag += ' '
-        tag += opt_hash.inject([]) do |t, el|
-          if el[1].class == Array
-            el[1] = el[1].join(' ')
-          end
+        tag_data += ' '
+        tag_data += opt_hash.inject([]) do |t, el|
+          key, value = el
 
-          t.push '%s="%s"' % [el[0], el[1].to_s.gsub(/"/, '&quot;')]
+          case value
+          when Array
+            value = value.join(' ')
+          when Hash
+            for el in value
+              t.push '%s-%s="%s"' % [key, el[0], _escape_param(el[1])]
+            end
+          else
+            t.push '%s="%s"' % [key, _escape_param(value)]
+          end
           t
         end.join(' ')
       end
 
       unless EMPTY_TAGS.include?(name)
-        tag += '>'
+        tag_data += '>'
       end
 
-      @_iv.data << tag
+      @_iv.data << tag_data
 
       # nested blocks
       if block
@@ -108,10 +108,10 @@ module HtmlTag
         @_iv.data << ' />'
       else
         unless opt_data
-          @_iv.data << ' ' * @_iv.depth
+          @_iv.data << _depth_spaces
         end
 
-        @_iv.data << "%s</%s>\n" % [opt_data, name]
+        @_iv.data << '%s</%s>%s' % [opt_data, name, _depth_new_line]
       end
     end
 
@@ -120,12 +120,61 @@ module HtmlTag
     end
 
     def method_missing name, *args, &block
-      message = [
-        %{HTML node "#{name}" not found.},
-        "Use this.#{name}() to call node in parent context",
-        "or use node(:#{name}, params, data) to add custom html node."
-      ]
-      raise NoMethodError.new(message.join(' '))
+      klass = name.to_s
+
+      if klass.start_with?('_')
+        # _foo__bar-baz class: 'dux' ->  <div class="foo bar-baz dux"></div>
+        classes = klass
+          .sub('_', '')
+          .split('__')
+          .map{|it| it.gsub('_', '-') }
+          .join(' ')
+
+        prepared = _prepare_tag_params args
+
+        prepared[0] ||= {}
+        prepared[0][:class] = "#{classes} #{prepared[0][:class]}".sub(/\s+$/, '')
+
+        tag :div, *prepared, &block
+      else
+        message = [
+          %{HTML tag "#{name}" not found.},
+          "Use this.#{name}() to call method in parent context",
+          "or use tag(:#{name}, params, data) to add custom html node."
+        ]
+        raise NoMethodError.new(message.join(' '))
+      end
+    end
+
+    private
+
+    def _prepare_tag_params args
+      opt_hash, opt_data = args
+
+      # allow any arragement of vars
+      # div class: :foo, 123
+      # div 123, class: :foo
+      if opt_hash && opt_hash.class != Hash
+        opt_hash, opt_data = opt_data, opt_hash
+      end
+
+      [opt_hash, opt_data]
+    end
+
+    def _depth_spaces
+      if OPTS[:format]
+        ' ' * 2 * @_iv.depth
+      else
+        ''
+      end
+    end
+
+    def _depth_new_line
+      OPTS[:format] ? $/ : ''
+    end
+
+    def _escape_param el
+      el.to_s.gsub(/"/, '&quot;')
     end
   end
 end

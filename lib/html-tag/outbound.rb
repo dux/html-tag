@@ -37,8 +37,14 @@ module HtmlTag
         # covert n._row_foo to n(class: 'row-foo')
         name = name.to_s
         if name.to_s[0, 1] == '_'
+          classes = name
+            .sub('_', '')
+            .split('__')
+            .map{|it| it.gsub('_', '-') }
+            .join(' ')
+
           opts ||= {}
-          opts[:class] = name.to_s.sub('_', '').gsub('_', '-')
+          opts[:class] = "#{classes} #{opts[:class]}".sub(/\s+$/, '')
           name = :div
         end
 

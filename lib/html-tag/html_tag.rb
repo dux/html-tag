@@ -5,6 +5,12 @@ require 'set'
 module HtmlTag
   extend self
 
+  ###
+
+  OPTS = {
+    format: false
+  }
+
   TAGS ||= Set.new %i(
     a b button code colgroup dd div dl dt em fieldset form h1 h2 h3 h4 h5 h6
     header i iframe label legend li main map nav noscript object ol optgroup option p pre q

@@ -23,12 +23,11 @@ Example
 
 # without node pointer
 # - invoked when calling class as a method
-# - block is run in context of HtmlTag class instance
-# - use "this" prefix to access methods in parent context
-# - instance variables are accessible
+# - block is executed in context of HtmlTag class instance
+# - use "this" prefix (or context or parent) to access methods in parent context
 HtmlTag :ul do
   li do
-    a href: '#', class: this.klass_name
+    a href: '#', class: this.method_in_caller_scope
   end
 
   @list.each_with_index do |el, i|
@@ -37,11 +36,10 @@ HtmlTag :ul do
 end
 
 # with node pointers
-# - more efficient but not so readable
-# - block is run in context of caller
+# - block is executed in context of a caller
 HtmlTag.ul do |n|
   n.li do |n|
-    n.a href: '#', class: klass_names
+    n.a href: '#', class: method_in_caller_scopes
   end
 
   @list.each_with_index do |el, i|
@@ -49,28 +47,25 @@ HtmlTag.ul do |n|
   end
 end
 
-# imports tag method
-# then use "tag" or "HtmlTag" without import
-= tag.ul do |n|                # <ul>
-  1.upto(3) do |num|           #
-    n.li do |n|                #   <li>
-      n.i 'arrow'              #     <i class="arrow"></i>
-      n._arrow                 #     <div class="arrow"></div>
-      n.span 123               #     <span>123</span>
-      n.span { 123 }           #     <span>123</span>
-      n._foo                   #     <div class="foo"></div>
-      n._foo(bar: baz) { 123 } #     <div class="foo" bar="baz">123</div>
-      n.i(foo: [:bar, :baz])   #     <i foo="bar baz"></i>
-    end                        #   </li>
-  end                          #
-end                            # </ul>
+# example
+HtmlTag :ul do             # <ul>
+  1.upto(3) do |num|       #
+    li do |n|              #   <li>
+      i 'arrow'            #     <i class="arrow"></i>
+      _arrow__foo_bar 123  #     <div class="arrow foo-bar">123</div>
+      span 123             #     <span>123</span>
+      _foo(123, bar: baz)  #     <div class="foo" bar="baz">123</div>
+      i(foo: [:bar, :baz]) #     <i foo="bar baz"></i>
+    end                    #   </li>
+  end                      #
+end                        # </ul>
 ```
 
 ### More examples
 
 #### Tag without data
 ```ruby
-= tag.div
+= HtmlTag.div
 ```
 
 ```html
@@ -79,8 +74,8 @@ end                            # </ul>
 
 #### Empty tags
 ```ruby
-= tag.hr
-= tag.meta name: :foo, description: :bar
+= HtmlTag.hr
+= HtmlTag.meta name: :foo, description: :bar
 ```
 
 ```html
@@ -90,7 +85,7 @@ end                            # </ul>
 
 #### Tag with block data
 ```ruby
-= tag.div { 'foo' }
+= HtmlTag.div { 'foo' }
 ```
 
 ```html
@@ -99,7 +94,7 @@ end                            # </ul>
 
 #### Tag with inline data and no params
 ```ruby
-= tag.div('baz')
+= HtmlTag.div('baz')
 ```
 
 ```html
@@ -108,7 +103,7 @@ end                            # </ul>
 
 #### Tag with inline data and params
 ```ruby
-= tag.div('baz', {foo: :bar})
+= HtmlTag.div('baz', {foo: :bar})
 ```
 
 ```html
@@ -117,19 +112,19 @@ end                            # </ul>
 
 #### Tag with class shortcut
 ```ruby
-= tag._foo
-= HtmlTag.i(:foo) { 'baz' } 
+= HtmlTag._foo
+= HtmlTag._foo__bar_baz 123
 ```
 
 ```html
 <div class="foo"></div>
-<i class="foo">baz</i>
+<i class="foo bar-baz">123</i>
 ```
 
 #### Tag with nested opts and shortcut
 
 ```ruby
-= tag._miki(id: :foo, data: { bar: :baz })
+= HtmlTag._miki(id: :foo, data: { bar: :baz })
 ```
 
 ```html
@@ -139,14 +134,15 @@ end                            # </ul>
 #### Tag with underscore notation and array attributes
 
 ```ruby
-= tag._foo_bar__baz(data: { foo: %w(bar baz) }))
+= HtmlTag._foo_bar__baz(data: { foo: %w(bar baz) }))
 ```
 
 ```html
 <div data-foo="bar baz" class="foo-bar baz"></div>
 ```
 
-#### Tag with nested data
+#### Tag with nested data and manual push
+
 ```ruby
 HtmlTag class: :foo do
   ul do

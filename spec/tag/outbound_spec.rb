@@ -38,7 +38,7 @@ describe HtmlTag do
       end
 
       it 'renders underscore notation and joins array attributes' do
-        expect(tag._foo_bar(data: { foo: %w(bar baz) })).to eq('<div data-foo="bar baz" class="foo-bar"></div>')
+        expect(tag._foo__bar_baz(data: { foo: %w(bar baz) })).to eq('<div data-foo="bar baz" class="foo bar-baz"></div>')
       end
 
       it 'renders arary data' do
