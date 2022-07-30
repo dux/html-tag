@@ -81,6 +81,16 @@ describe HtmlTag::Inbound do
       data = HtmlTag { _foo 456, data: {foo: :bar} }
       expect(data).to include(%[<div data-foo='bar' class='foo'>456</div>])
     end
+
+    it 'allows manual tag call' do
+      data = HtmlTag do
+        tag(:foo, bar: :baz) do
+          'dux'
+        end
+      end
+
+      expect(data).to eq("<div><foo bar='baz'>dux</foo></div>")
+    end
   end
 
   context 'outbound' do
@@ -89,7 +99,7 @@ describe HtmlTag::Inbound do
         12
       end
 
-      data = HtmlTag().ul do |n|
+      data = HtmlTag.ul do |n|
         n.li ofoo
         n.li {|n| n.push(34) }
       end

@@ -21,8 +21,8 @@ Example
 ```ruby
 # You can use it in 2 ways
 
-# without node pointer
-# - invoked when calling class as a method
+# without node pointers
+# - invoked when passing block to HtmlTag method
 # - block is executed in context of HtmlTag class instance
 # - use "this" prefix (or context or parent) to access methods in parent context
 HtmlTag :ul do
@@ -51,7 +51,7 @@ end
 HtmlTag :ul do             # <ul>
   1.upto(3) do |num|       #
     li do |n|              #   <li>
-      i 'arrow'            #     <i class="arrow"></i>
+      i class: 'arrow'     #     <i class="arrow"></i>
       _arrow__foo_bar 123  #     <div class="arrow foo-bar">123</div>
       span 123             #     <span>123</span>
       _foo(123, bar: baz)  #     <div class="foo" bar="baz">123</div>

@@ -1,8 +1,8 @@
 # Hash
 unless {}.respond_to?(:tag)
   class Hash
-    def tag node_name, inner_html=nil
-      HtmlTag().send node_name, self, inner_html
+    def tag node_name, inner_html=nil, &block
+      HtmlTag::Inbound.new.tag(node_name, inner_html, self, &block).join('')
     end
   end
 end
@@ -10,8 +10,8 @@ end
 # String
 unless ''.respond_to?(:tag)
   class String
-    def tag node_name, opts = nil
-      HtmlTag().send node_name, self, opts
+    def tag node_name, opts = nil, &block
+      HtmlTag::Inbound.new.tag(node_name, self, opts, &block).join('')
     end
   end
 end
@@ -44,6 +44,7 @@ def HtmlTag *args, &block
     out.send(*args, &block)
     out.render
   else
+    # HtmlTag._foo 123
     HtmlTag::Proxy.new
   end
 end

@@ -1,10 +1,4 @@
-# improved builder that is not pasing node pointers
-
-# HtmlTag do
-#   form do
-#     input name: q
-#   end
-# end
+# improved HTML builder that doess not need node pointers
 
 module HtmlTag
   class Inbound
@@ -103,12 +97,16 @@ module HtmlTag
       if block
         @_iv.depth += 1
 
-        if @_iv.context
+        block_data = if @_iv.context
           # HtmlTag scope
           instance_exec(&block)
         else
           # outbound scope
           block.call(self)
+        end
+
+        if block_data.class == String
+          @_iv.data << block_data
         end
 
         @_iv.depth -= 1
@@ -121,11 +119,19 @@ module HtmlTag
           @_iv.data << _depth_spaces
         end
 
+        if opt_data.class == Array
+          opt_data = opt_data.join('')\
+        end
+
         @_iv.data << '%s</%s>%s' % [opt_data, name, _depth_new_line]
       end
     end
 
-    def push data
+    def push data = nil
+      if block_given?
+        data = yield
+      end
+
       @_iv.data << data
     end
 
@@ -152,7 +158,7 @@ module HtmlTag
       # allow any arragement of vars
       # div class: :foo, 123
       # div 123, class: :foo
-      if opt_hash && opt_hash.class != Hash
+      if opt_data.class == Hash || (opt_hash && opt_hash.class != Hash)
         opt_hash, opt_data = opt_data, opt_hash
       end
 
