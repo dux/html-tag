@@ -94,17 +94,36 @@ describe HtmlTag::Inbound do
   end
 
   context 'outbound' do
-    it 'renders' do
+    it 'renders with scope' do
       def ofoo
         12
       end
 
-      data = HtmlTag.ul do |n|
+      data = HtmlTag().ul do |n|
         n.li ofoo
         n.li {|n| n.push(34) }
       end
 
       expect(data).to eq('<ul><li>12</li><li>34</li></ul>')
+    end
+
+    it 'renders without scope' do
+      def ofoo
+        12
+      end
+
+      data = HtmlTag.ul {|n| n.li ofoo }
+      expect(data).to eq('<ul><li>12</li></ul>')
+    end
+
+    it 'raises NoMethodError error' do
+      data = proc { HtmlTag().ul {|n| n.li ofoo2 } }
+      expect(data).to raise_error NoMethodError
+    end
+
+    it 'raises NoMethodError error' do
+      data = proc { HtmlTag.ul {|n| n.li ofoo2 } }
+      expect(data).to raise_error NameError
     end
   end
 end

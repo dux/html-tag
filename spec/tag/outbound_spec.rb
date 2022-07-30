@@ -10,7 +10,7 @@ describe HtmlTag do
       end
 
       it 'renders tag with block data' do
-        expect(tag.div { 'foo' }).to eq('<div>foo</div>')
+        expect(tag.div { ' foo ' }).to eq('<div> foo </div>')
       end
 
       it 'render meta tag' do

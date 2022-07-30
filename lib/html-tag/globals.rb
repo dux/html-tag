@@ -19,8 +19,8 @@ end
 # HtmlTag do ...
 module HtmlTag
   class Proxy
-    def initialize
-      @pointer = HtmlTag::Inbound.new
+    def initialize scope = nil
+      @pointer = HtmlTag::Inbound.new scope
     end
 
     def method_missing name, *args, &block
@@ -40,11 +40,12 @@ def HtmlTag *args, &block
   end
 
   if block
+    # HtmlTag(:ul) { li ... }
     out = HtmlTag::Inbound.new self
     out.send(*args, &block)
     out.render
   else
     # HtmlTag._foo 123
-    HtmlTag::Proxy.new
+    HtmlTag::Proxy.new self
   end
 end

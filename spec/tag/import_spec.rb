@@ -18,6 +18,18 @@ class Foo < Bar
   def data2
     HtmlTag.div 'foo'
   end
+
+  def data3
+    tag.ul do
+      li 1
+    end
+  end
+
+  def data4
+    tag.ul do |n|
+      n.li 1
+    end
+  end
 end
 
 ##
@@ -34,7 +46,15 @@ describe HtmlTag do
       end
 
       it 'metod missing not triggering on not direct calls' do
-        expect { Foo.new.data3 }.to raise_error NoMethodError
+        expect { Foo.new.data_not_found }.to raise_error NoMethodError
+      end
+
+      it 'renders' do
+        expect(Foo.new.data3).to eq("<ul><li>1</li></ul>")
+      end
+
+      it 'renders' do
+        expect(Foo.new.data4).to eq("<ul><li>1</li></ul>")
       end
     end
   end

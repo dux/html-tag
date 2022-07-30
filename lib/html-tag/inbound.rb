@@ -2,17 +2,25 @@
 
 module HtmlTag
   class Inbound
-    IVARS ||= Struct.new :HtmlTagInboundIvars, :context, :data, :depth, :inbound
+    IVARS ||= Struct.new :HtmlTagInboundIvars, :context, :data, :depth
+
+    TAGS ||= Set.new %i(
+      a article b button code center colgroup dd div dl dt em fieldset form h1 h2 h3 h4 h5 h6
+      header i iframe label legend li main map nav noscript object ol optgroup option p pre q
+      script section select small span sub strong style summary table tbody td textarea tfoot th thead title tr u ul video
+    )
+
+    EMPTY_TAGS ||= Set.new %w(area base br col embed hr img input keygen link meta param source track wbr)
 
     # allows to add cusom tags if needed
     # HtmlTag::Inbound.define :foo
-    def self.define tag, empty: false
+    def self.define name, empty: false
       if empty
-        EMPTY_TAGS.add tag
+        EMPTY_TAGS.add name
       end
 
-      define_method tag do |*args, &block|
-        tag tag, *args, &block
+      define_method name do |*args, &block|
+        tag name, *args, &block
       end
     end
 
@@ -35,7 +43,6 @@ module HtmlTag
       @_iv.context = context
       @_iv.data    = []
       @_iv.depth   = 0
-      @_iv.inbound = true
     end
 
     # access parent context via parent / context / this
@@ -55,7 +62,7 @@ module HtmlTag
       @_iv.data
         .join('')
         .gsub(/\n+/, $/)
-        .gsub(/([\w>])[[:blank:]]+</, '\1<')
+        #.gsub(/([\w>])[[:blank:]]+</, '\1<')
     end
 
     # render single node
@@ -99,7 +106,7 @@ module HtmlTag
 
         block_data = if @_iv.context
           # HtmlTag scope
-          instance_exec(&block)
+          instance_exec(self, &block)
         else
           # outbound scope
           block.call(self)
@@ -140,6 +147,8 @@ module HtmlTag
 
       if klass.start_with?('_')
         tag klass, *args, &block
+      elsif @_iv.context
+        @_iv.context.send name, *args, &block
       else
         message = [
           %{HTML tag "#{name}" not found.},
