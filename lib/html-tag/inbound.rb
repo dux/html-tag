@@ -48,6 +48,10 @@ module HtmlTag
     # access parent context via parent / context / this
     # h1 class: this.class_name
     def parent &block
+      unless @_iv.context
+        raise 'Host scope is not available'
+      end
+
       if block
         @_iv.context.instance_exec(&block)
       else

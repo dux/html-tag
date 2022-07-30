@@ -125,5 +125,10 @@ describe HtmlTag::Inbound do
       data = proc { HtmlTag.ul {|n| n.li ofoo2 } }
       expect(data).to raise_error NameError
     end
+
+    it 'raises NameErorr error when used without scope' do
+      data = proc { HtmlTag.ul { li 123 } }
+      expect(data).to raise_error NameError
+    end
   end
 end
