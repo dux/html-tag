@@ -32,20 +32,30 @@ module HtmlTag
 end
 
 def HtmlTag *args, &block
-  args[0] ||= :div
-
-  if args[0].class == Hash
-    args[1] = args[0]
-    args[0] = :div
-  end
-
-  if block
-    # HtmlTag(:ul) { li ... }
-    out = HtmlTag::Inbound.new self
-    out.send(*args, &block)
-    out.render
+  if args[0].class == Class
+    # imports tag method without poluting ancesstors namespace
+    # class SomeClass
+    #   HtmlTag self
+    args[0].define_method :tag do |*tag_args, &tag_block|
+      HtmlTag *tag_args, &tag_block
+    end
   else
-    # HtmlTag._foo 123
-    HtmlTag::Proxy.new self
+    # HtmlTag do ...
+    args[0] ||= :div
+
+    if args[0].class == Hash
+      args[1] = args[0]
+      args[0] = :div
+    end
+
+    if block
+      # HtmlTag(:ul) { li ... }
+      out = HtmlTag::Inbound.new self
+      out.send(*args, &block)
+      out.render
+    else
+      # HtmlTag._foo 123
+      HtmlTag::Proxy.new self
+    end
   end
 end

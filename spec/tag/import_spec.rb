@@ -3,11 +3,7 @@ require 'spec_helper'
 ###
 
 class Bar
-  prepend HtmlTag
-  
-  def tag
-    'error'
-  end
+  include HtmlTag
 end
 
 class Foo < Bar
