@@ -32,7 +32,7 @@ module HtmlTag
 end
 
 def HtmlTag *args, &block
-  if args[0].class == Class
+  if [Class, Module].include?(args[0].class)
     # imports tag method without poluting ancesstors namespace
     # class SomeClass
     #   HtmlTag self

@@ -2,6 +2,18 @@ require 'spec_helper'
 
 ###
 
+module ModTest
+  extend self
+
+  HtmlTag self
+
+  def render
+    tag.ul do
+      li 1
+    end
+  end
+end
+
 class Bar
   include HtmlTag
 end
@@ -51,6 +63,10 @@ describe HtmlTag do
 
       it 'renders' do
         expect(Foo.new.data4).to eq("<ul><li>1</li></ul>")
+      end
+
+      it 'renders' do
+        expect(ModTest.render).to eq("<ul><li>1</li></ul>")
       end
     end
   end

@@ -66,6 +66,23 @@ HtmlTag.ul do 'n'
 end
 ```
 
+You do not have to import `HtmlTag`, you can inject `tag` method in `Class` or `Module`
+without polluting ancestors namespace.
+
+```ruby
+class Foo
+  # instead
+  include HtmlTag
+
+  # or
+  prepend HtmlTag
+
+  # you can use
+  HtmlTag self
+end
+```
+
+
 ### More examples
 
 #### Tag without data
@@ -118,12 +135,12 @@ end
 #### Tag with class shortcut
 ```ruby
 = _foo
-= _foo__bar_baz 123
+= _foo__bar_baz 123, class: 'dux'
 ```
 
 ```html
 <div class="foo"></div>
-<i class="foo bar-baz">123</i>
+<i class="foo bar-baz dux">123</i>
 ```
 
 #### Tag with nested opts and shortcut
@@ -134,16 +151,6 @@ end
 
 ```html
 <div id="foo" data-bar="baz" class="miki"></div>
-```
-
-#### Tag with underscore notation and array attributes
-
-```ruby
-= _foo_bar__baz(data: { foo: 'bar baz' }))
-```
-
-```html
-<div data-foo="bar baz" class="foo-bar baz"></div>
 ```
 
 #### Tag with nested data and manual push
