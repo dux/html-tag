@@ -83,7 +83,7 @@ module HtmlTag
 
           if value.class == Hash
             for el in value
-              t.push "%s-%s='%s'" % [key, el[0], _escape_param(el[1])]
+              t.push '%s-%s=%s' % [key, el[0], _escape_param(el[1])]
             end
           else
             if value.class == Array
@@ -92,7 +92,7 @@ module HtmlTag
 
             key = key.to_s.sub(/^data_/, 'data-')
 
-            t.push "%s='%s'" % [key, _escape_param(value)]
+            t.push '%s=%s' % [key, _escape_param(value)]
           end
           t
         end.join(' ')
@@ -206,7 +206,16 @@ module HtmlTag
     end
 
     def _escape_param el
-      el.to_s.gsub(/'/, '&apos;')
+      data = el.to_s
+
+      if data.include?('"')
+        # if we dump json export to a tag attribute, there will be a lot of qutes
+        # it is much more readable to use quot(') insted of quote (") in this case
+        "'%s'" % data.gsub(/'/, '&apos;')
+      else
+        # regualr node
+        '"%s"' % data
+      end
     end
   end
 end
