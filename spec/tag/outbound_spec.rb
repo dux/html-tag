@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe HtmlTag do
-  let!(:tag) { HtmlTag }
+  HtmlTag self
 
   describe 'Renders as expected' do
     context 'without a framework' do
@@ -93,6 +93,21 @@ describe HtmlTag do
       it 'allowes opts and data to be send in any way' do
         expect(tag.div('foo', bar: :baz)).to eq(%[<div bar="baz">foo</div>])
         expect(tag.div({bar: :baz}, 'foo')).to eq(%[<div bar="baz">foo</div>])
+      end
+
+      it 'does not appends data if is not only nodde' do
+        data = tag.ul do
+          li
+          'foo'
+        end
+
+        expect(data).to eq('<ul><li></li></ul>')
+      end
+
+      it 'does append data' do
+        data = tag.ul { 'foo' }
+
+        expect(data).to eq('<ul>foo</ul>')
       end
     end
   end

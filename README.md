@@ -101,11 +101,14 @@ end
 ```
 
 ```html
-<div></div>
+<hr />
 <meta name="foo" description="bar" />
 ```
 
 #### Tag with block data
+
+If block does not have child nodes and returns string, string will be used as data.
+
 ```ruby
 = div { 'foo' }
 ```

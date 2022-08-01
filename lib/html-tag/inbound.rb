@@ -40,9 +40,9 @@ module HtmlTag
 
       # lets keep all instance vars in one object
       @_iv = IVARS.new
-      @_iv.context = context
-      @_iv.data    = []
-      @_iv.depth   = 0
+      @_iv.context   = context
+      @_iv.data      = []
+      @_iv.depth     = 0
     end
 
     # access parent context via parent / context / this
@@ -107,6 +107,7 @@ module HtmlTag
       # nested blocks
       if block
         @_iv.depth += 1
+        node_count = @_iv.data.length
 
         block_data = if @_iv.context
           # HtmlTag scope
@@ -116,7 +117,7 @@ module HtmlTag
           block.call(self)
         end
 
-        if block_data.class == String
+        if block_data.class == String && node_count == @_iv.data.length
           @_iv.data << block_data
         end
 
