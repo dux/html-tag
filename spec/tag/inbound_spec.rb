@@ -118,17 +118,17 @@ describe HtmlTag::Inbound do
 
     it 'raises NoMethodError error' do
       data = proc { HtmlTag().ul {|n| n.li ofoo2 } }
-      expect(data).to raise_error NoMethodError
+      expect{ data.call }.to raise_error NoMethodError
     end
 
     it 'raises NoMethodError error' do
       data = proc { HtmlTag.ul {|n| n.li ofoo2 } }
-      expect(data).to raise_error NameError
+      expect{ data.call }.to raise_error NameError
     end
 
     it 'raises NameErorr error when used without scope' do
       data = proc { HtmlTag.ul { li 123 } }
-      expect(data).to raise_error NameError
+      expect{ data.call }.to raise_error NameError
     end
   end
 end
