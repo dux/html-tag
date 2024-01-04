@@ -206,6 +206,12 @@ end
 <bold class="baz">foo</bold>
 ```
 
+## Speed test
+
+Compares `Nokogiri::XML::Builder` with two modes for `html-tag`.
+
+`rake speed`
+
 ## Dependency
 
 none
