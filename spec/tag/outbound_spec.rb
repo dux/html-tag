@@ -44,16 +44,17 @@ describe HtmlTag do
       it 'renders tag with nested data' do
         data =
         tag._foo do |n|
-          n.ul do |n|
-            n.li do |n|
-              n.a(href: '#') { 'baz' }
+          n.ul do
+            n.li do
+              n.a(href: '#') { 'baz1' }
+              n.a(href: '#') { 'baz2' }
             end
             n.push 123
             n.push { 456 }
           end
         end
 
-        expect(data).to eq(%[<div class="foo"><ul><li><a href="#">baz</a></li>123456</ul></div>])
+        expect(data).to eq(%[<div class="foo"><ul><li><a href="#">baz1</a><a href="#">baz2</a></li>123456</ul></div>])
       end
 
       it 'renders html in array' do

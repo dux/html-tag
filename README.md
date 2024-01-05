@@ -52,15 +52,16 @@ end
 Useable without importing `HtmlTag`.
 
 ```ruby
+# if you pass node name as a argument, block will be executed in HtmlTag instance scope
 HtmlTag :ul do
   li do
     a link_to, href: '#'
   end
 end
 
-# if you want code to be executed in host scope and not HtlmTag one
-HtmlTag.ul do 'n'
-  n.li do |n|
+# if you want code to be executed in host scope, use pointer and this syntax (preferred)
+HtmlTag.ul do |n|
+  n.li do
     n.a link_to, href: '#'
   end
 end
